@@ -47,8 +47,8 @@
 
         // Load external data and boot
         d3.queue()
-            .defer(d3.json, "/data/europe.geo.json")
-            .defer(d3.csv, "/data/owid-covid-data-Europe.csv", function (d) {
+            .defer(d3.json, "data/europe.geo.json")
+            .defer(d3.csv, "data/owid-covid-data-Europe.csv", function (d) {
 
                 element = {
                     "date": d.date,
