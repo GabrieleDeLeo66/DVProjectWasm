@@ -226,11 +226,17 @@
 
 <h1 style="font-family: Cambria">Covid Night-teen Fever - an ill Europe</h1>
 
-<MudDatePicker IsDateDisabledFunc="@((DateTime dt)=>((int)dt.DayOfWeek > 0 && (int)dt.DayOfWeek < 7))" Label="Selected Date" MinDate=@DateTime.Parse("2020-01-05") MaxDate="@DateTime.Parse("2024-08-04")" Date="_date" DateChanged="@((d) => OnDateChanged(d))" />
+@* <MudDatePicker IsDateDisabledFunc="@((DateTime dt)=>((int)dt.DayOfWeek > 0 && (int)dt.DayOfWeek < 7))" Label="Selected Date" MinDate=@DateTime.Parse("2020-01-05") MaxDate="@DateTime.Parse("2024-08-04")" Date="_date" DateChanged="@((d) => OnDateChanged(d))" /> *@
 
 <div class="container">
-    <div class="row">
-        <div class="col-sm-10" id="map"></div>
+    <div class="row">      
+        <div class="col-sm-10" id="map">
+            @if (Loading) {
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border m-5" style="width: 50px; height: 50px;" role="status" />
+                </div>
+            }
+        </div>
         <div class="col-sm-2">
             <SfLinearGauge Width="100px" Height="400px" Background="transparent">
                 <LinearGaugeContainer Width="20" Type="ContainerType.Thermometer">

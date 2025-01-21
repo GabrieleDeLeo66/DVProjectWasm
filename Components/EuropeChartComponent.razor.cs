@@ -6,13 +6,34 @@ namespace DVProject_Wasm.Components
     public partial class EuropeChartComponent : ComponentBase
     {
         private DateTime? _date = DateTime.Parse("2021-01-10");
+        [Parameter]
+        public DateTime? SelectedDate { get; set; }
+        [Parameter]
+        public bool Loading { get; set; }
+        public bool RenderCooldown = false;
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
-            if (firstRender)
+            if (!RenderCooldown)
             {
-                await Task.Delay(5000);
-                await JS.InvokeVoidAsync("MapEurope", _date?.ToString("yyyy-MM-dd"));
+                if (firstRender)
+                {
+                    await base.OnAfterRenderAsync(firstRender);
+                    await Task.Delay(4000);
+                    await JS.InvokeVoidAsync("MapEurope", SelectedDate?.ToString("yyyy-MM-dd"));
+                }
+                else
+                {
+                    await Task.Delay(4000);
+                    await JS.InvokeVoidAsync("UpdateEurope", SelectedDate?.ToString("yyyy-MM-dd"));
+                }
+
+                Loading = false;
+                RenderCooldown = true;
+                StateHasChanged();
+            }
+            else
+            {
+                RenderCooldown = false;
             }
         }
 
@@ -30,10 +51,14 @@ namespace DVProject_Wasm.Components
 
         public async Task OnDateChanged(DateTime? value)
         {
+            Loading = true;
+            RenderCooldown = true;
+            StateHasChanged();
             _date = value;
             var valueString = value?.ToString("yyyy-MM-dd");
-            //await JS.InvokeVoidAsync("MapEurope", valueString);
+            await Task.Delay(5000);
             await JS.InvokeVoidAsync("UpdateEurope", valueString);
+            StateHasChanged();
         }
     }
 }

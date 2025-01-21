@@ -7,18 +7,32 @@ namespace DVProject_Wasm.Components
     {
         [Parameter]
         public string SelectedCountry { get; set; } = "Italy";
+        [Parameter]
+        public bool Loading { get; set; }
+
+        public bool RenderCooldown = false;
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
-            if (firstRender)
+            if (!RenderCooldown)
             {
-                await Task.Delay(1000);
-                await JS.InvokeVoidAsync("CreateChart", SelectedCountry);
+                if (firstRender)
+                {
+                    await base.OnAfterRenderAsync(firstRender);
+                    await Task.Delay(1000);
+                    await JS.InvokeVoidAsync("CreateChart", SelectedCountry);
+                }
+                else
+                {
+                    await Task.Delay(1000);
+                    await JS.InvokeVoidAsync("UpdateChart", SelectedCountry);
+                }
+                Loading = false;
+                RenderCooldown = true;
+                StateHasChanged();
             }
             else
             {
-                await Task.Delay(1000);
-                await JS.InvokeVoidAsync("UpdateChart", SelectedCountry);
+                RenderCooldown = false;
             }
         }
     }

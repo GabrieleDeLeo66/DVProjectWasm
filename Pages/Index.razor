@@ -1,6 +1,18 @@
 ﻿@page "/"
 @using DVProject_Wasm.Components
+@using MudBlazor
 
 <PageTitle>Index</PageTitle>
 
-<EuropeChartComponent></EuropeChartComponent>
+<MudDatePicker IsDateDisabledFunc="@((DateTime dt)=>((int)dt.DayOfWeek > 0 && (int)dt.DayOfWeek < 7))" Label="Selected Date" MinDate=@DateTime.Parse("2020-01-05") MaxDate="@DateTime.Parse("2024-08-04")" Date="@SelectedDate" DateChanged="@((d) => OnDateChanged(d))" />
+<EuropeChartComponent Loading=@Loading SelectedDate=@SelectedDate></EuropeChartComponent>
+
+@code {
+    public bool Loading = true;
+    public DateTime? SelectedDate { get; set; } = DateTime.Parse("2021-01-10");
+    public async Task OnDateChanged(DateTime? value)
+    {
+        Loading = true;
+        SelectedDate = value;
+    }
+}

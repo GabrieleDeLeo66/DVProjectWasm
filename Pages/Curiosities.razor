@@ -34,9 +34,10 @@
     </MudSelectItem>
 </MudSelect>
 
-<DVProject_Wasm.Components.CuriositiesChartComponent SelectedCountry="@Country"></DVProject_Wasm.Components.CuriositiesChartComponent>
+<DVProject_Wasm.Components.CuriositiesChartComponent SelectedCountry="@Country" Loading="@Loading"></DVProject_Wasm.Components.CuriositiesChartComponent>
 
 
 @code {
     public string Country { get; set; } = "Italy";
+    public bool Loading = true;
 }

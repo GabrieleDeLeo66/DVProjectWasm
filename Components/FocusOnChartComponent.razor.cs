@@ -8,19 +8,34 @@ namespace DVProject_Wasm.Components
         [Parameter]
         public string SelectedField { get; set; } = "total_cases";
 
+        [Parameter]
+        public bool Loading { get; set; }
+
+        public bool RenderCooldown = false;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
-            if (firstRender)
+            if (!RenderCooldown)
             {
-                await Task.Delay(1000);
-                await JS.InvokeVoidAsync("CreateChart", SelectedField);
+                if (firstRender)
+                {
+                    await base.OnAfterRenderAsync(firstRender);
+                    await Task.Delay(1000);
+                    await JS.InvokeVoidAsync("CreateChart", SelectedField);
+                }
+                else
+                {
+                    await Task.Delay(1000);
+                    await JS.InvokeVoidAsync("UpdateChart", SelectedField);
+                }
+                Loading = false;
+                RenderCooldown = true;
+                StateHasChanged();
             }
             else
             {
-                await Task.Delay(1000);
-                await JS.InvokeVoidAsync("UpdateChart", SelectedField);
-            }
+                RenderCooldown = false;
+            }          
         }
     }
 }
