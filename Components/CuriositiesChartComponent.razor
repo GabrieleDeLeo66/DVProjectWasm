@@ -236,7 +236,7 @@
 
         var mainCountry = ["Italy", "France", "Spain", "Portugal", "Germany", "United Kingdom", "Netherlands", "Russia"];
             d3.queue()
-                .defer(d3.csv, "/data/owid-covid-data-Europe.csv", function (d) {
+                .defer(d3.csv, "data/owid-covid-data-Europe.csv", function (d) {
                     var date = new Date(d.date)
                     if (mainCountry.includes(d.location) /* && date.getDay() == 0 && date.getMonth()%2 == 0 */) {
                         element = {

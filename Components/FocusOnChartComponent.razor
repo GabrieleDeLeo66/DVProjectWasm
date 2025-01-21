@@ -82,7 +82,7 @@
         yAxis.set("tooltip", am5.Tooltip.new(root, {}));
 
         d3.queue()
-            .defer(d3.csv, "/data/owid-covid-data-Europe.csv", function (d) {
+            .defer(d3.csv, "data/owid-covid-data-Europe.csv", function (d) {
                 if (d.location != "Europe" && d.location != "European Union" && d.location != "European Union (27)") {
                     element = {
                         "date": d.date,
@@ -229,7 +229,7 @@
             marker.children.push(am5.Picture.new(root, {
                 width: 20,
                 height: 20,
-                src: "/data/flags/MiniFlatFlags_" + legendDataItem.dataContext.get("legendLabelText") + ".svg"
+                src: "data/flags/MiniFlatFlags_" + legendDataItem.dataContext.get("legendLabelText") + ".svg"
             }));
         }
 
