@@ -1,0 +1,249 @@
+﻿@using MudBlazor
+@using Syncfusion.Blazor.LinearGauge
+<script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+@inject IJSRuntime JS
+
+<style>
+    #chartdiv {
+        width : 100%;
+        height : 90vh;
+        font-size : 11px;
+    }
+</style>
+
+<script>
+    var root;
+    var chart;
+    var data = [];
+    var selectedField;
+    var xAxis;
+    var yAxis;
+    var legend;
+
+	function CreateChart(field) {
+        selectedField = field;
+
+        root = am5.Root.new("chartdiv");
+        root.setThemes([
+            am5themes_Animated.new(root)
+        ]);
+        chart = root.container.children.push(
+            am5xy.XYChart.new(root, {
+                maxTooltipDistance: 0,
+                layout: root.verticalLayout
+            })
+        );
+
+        legend = chart.children.push(am5.Legend.new(root, {
+            x: am5.percent(50),
+            centerX: am5.percent(50),
+            layout: root.gridLayout,
+            height: am5.percent(20),
+            verticalScrollbar: am5.Scrollbar.new(root, {
+                orientation: "vertical"
+            })
+        }));
+
+        chart.set("scrollbarX", am5.Scrollbar.new(root, { orientation: "horizontal" }));
+        chart.set("scrollbarY", am5.Scrollbar.new(root, { orientation: "vertical" }));
+        chart.set("cursor", am5xy.XYCursor.new(root, {
+            behavior: "zoomXY"
+        }));
+
+        yAxis = chart.yAxes.push(
+            am5xy.ValueAxis.new(root, {
+                maxDeviation: 1,
+                renderer: am5xy.AxisRendererY.new(root, {
+                    pan: "zoom"
+                })
+            })
+        );
+        xAxis = chart.xAxes.push(
+            am5xy.DateAxis.new(root, {
+                baseInterval: { timeUnit: "day", count: 1 },
+                min: new Date(2020, 01, 05).getTime(),
+                max: new Date(2024, 08, 04).getTime(),
+                maxDeviation: 1,
+                renderer: am5xy.AxisRendererX.new(root, {
+                    pan: "zoom"
+                })
+            })
+        );
+        xAxis.get("dateFormats")["day"] = "dd/MM/yyyy";
+        xAxis.set("tooltip", am5.Tooltip.new(root, {}));
+
+        yAxis.set("tooltip", am5.Tooltip.new(root, {}));
+
+        d3.queue()
+            .defer(d3.csv, "/data/owid-covid-data-Europe.csv", function (d) {
+                if (d.location != "Europe" && d.location != "European Union" && d.location != "European Union (27)") {
+                    element = {
+                        "date": d.date,
+                        "location": d.location,
+                        "total_cases": d.total_cases,
+                        "total_deaths": d.total_deaths,
+                        "total_vaccinations": ((d.total_vaccinations == 0) ? null : d.total_vaccinations),
+                        "total_tests": ((d.total_tests) == 0 ? null : d.total_tests)
+                    };
+                    //element[field] = d[i][field];
+
+                    if (!data[d.location]) {
+                        data[d.location] = [element];
+                    }
+                    else {
+                        tmp = data[d.location];
+                        tmp.push(element);
+                        data[d.location] = tmp;
+                    }
+                }
+            })
+            .await(ready);
+	}
+
+    var mainCountry = [ "Italy", "France", "Spain", "Portugal", "Germany", "United Kingdom", "Netherlands", "Russia" ]
+
+    function ready() {
+        console.log(data)
+        console.log(selectedField)
+
+        var locations = Object.keys(data);
+        for (var i = 0; i < locations.length; i++) {
+
+            var tot_cases = chart.series.push(
+                am5xy.LineSeries.new(root, {
+                    name: "total_cases_" + locations[i],
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: "total_cases",
+                    valueXField: "date",
+                    tooltip: am5.Tooltip.new(root, {
+                        labelText: "[bold]"+ locations[i] +"[/]\n{valueX.formatDate()}: {valueY}"
+                    }), 
+                    legendLabelText: locations[i],
+                    visible: mainCountry.includes(locations[i]),
+                    interpolationDuration: 2000,
+                    interpolationEasing: am5.ease.inOut(am5.ease.elastic)
+                })
+            );
+            tot_cases.data.processor = am5.DataProcessor.new(root, {
+                numericFields: ["total_cases"],
+                dateFields: ["date"],
+                dateFormat: "dd-MM-yyyy"
+            });
+            if (selectedField == "total_cases")
+                tot_cases.data.setAll(data[locations[i]]);
+            console.log(tot_cases)
+
+            var tot_deaths = chart.series.push(
+                am5xy.LineSeries.new(root, {
+                    name: "total_deaths_" + locations[i],
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: "total_deaths",
+                    valueXField: "date",
+                    tooltip: am5.Tooltip.new(root, {
+                        labelText: "[bold]" + locations[i] + "[/]\n{valueX.formatDate()}: {valueY}"
+                    }),
+                    legendLabelText: locations[i],
+                    visible: mainCountry.includes(locations[i])
+                })
+            );
+            tot_deaths.data.processor = am5.DataProcessor.new(root, {
+                numericFields: ["total_deaths"],
+                dateFields: ["date"],
+                dateFormat: "dd-MM-yyyy"
+            });
+            if (selectedField == "total_deaths")
+                tot_deaths.data.setAll(data[locations[i]]);
+            console.log(tot_deaths)
+
+            var tot_vaccinations = chart.series.push(
+                am5xy.LineSeries.new(root, {
+                    name: "total_vaccinations_" + locations[i],
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: "total_vaccinations",
+                    valueXField: "date",
+                    tooltip: am5.Tooltip.new(root, {
+                        labelText: "[bold]" + locations[i] + "[/]\n{valueX.formatDate()}: {valueY}"
+                    }),
+                    legendLabelText: locations[i],
+                    visible: mainCountry.includes(locations[i])
+                })
+            );
+            tot_vaccinations.data.processor = am5.DataProcessor.new(root, {
+                numericFields: ["total_vaccinations"],
+                dateFields: ["date"],
+                dateFormat: "dd-MM-yyyy"
+            });
+            if (selectedField == "total_vaccinations")
+                tot_vaccinations.data.setAll(data[locations[i]]);
+            console.log(tot_deaths)
+
+            var tot_tests = chart.series.push(
+                am5xy.LineSeries.new(root, {
+                    name: "total_tests_" + locations[i],
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: "total_tests",
+                    valueXField: "date",
+                    tooltip: am5.Tooltip.new(root, {
+                        labelText: "[bold]" + locations[i] + "[/]\n{valueX.formatDate()}: {valueY}"
+                    }),
+                    legendLabelText: locations[i],
+                    visible: mainCountry.includes(locations[i])
+                })
+            );
+            tot_tests.data.processor = am5.DataProcessor.new(root, {
+                numericFields: ["total_tests"],
+                dateFields: ["date"],
+                dateFormat: "dd-MM-yyyy"
+            });
+            if (selectedField == "total_tests")
+                tot_tests.data.setAll(data[locations[i]]);
+            console.log(tot_deaths)
+
+        }
+
+        // legend = chart.children.push(am5.Legend.new(root, {
+        //     x: am5.percent(50),
+        //     centerX: am5.percent(50),
+        //     layout: root.gridLayout,
+        //     height: am5.percent(20),
+        //     verticalScrollbar: am5.Scrollbar.new(root, {
+        //         orientation: "vertical"
+        //     })
+        // }));
+        legend.data.setAll(chart.series.values.filter((p) => p._settings.name.includes(selectedField)));
+
+        for (var i = 0; i < legend.dataItems.length; i++) {
+            var legendDataItem = legend.dataItems[i];
+            var marker = legendDataItem.get("marker")
+            marker.children.push(am5.Picture.new(root, {
+                width: 20,
+                height: 20,
+                src: "/data/flags/MiniFlatFlags_" + legendDataItem.dataContext.get("legendLabelText") + ".svg"
+            }));
+        }
+
+        chart.appear(2000, 500);
+        // legendDataItem.get("markerRectangle").set("forceHidden", true);
+    }
+
+    function UpdateChart(newField) {
+        selectedField = newField;
+        chart.series.clear();
+        legend.data.clear();
+        ready();
+    }
+</script>
+
+
+<div id="chartdiv"></div>

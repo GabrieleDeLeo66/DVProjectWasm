@@ -1,0 +1,42 @@
+﻿@page "/curiosities"
+@using DVProject_Wasm
+@using MudBlazor
+
+
+<PageTitle>Curiosities</PageTitle>
+
+<h1 style="font-family: Cambria">Curiosities</h1>
+
+<MudSelect @bind-Value="@Country" Label="Country" Variant="Variant.Outlined">
+    <MudSelectItem Value="@("France")">
+        <img src="/data/flags/MiniFlatFlags_France.svg" height="14" class="mr-1" /> France
+    </MudSelectItem>
+    <MudSelectItem Value="@("Germany")">
+        <img src="/data/flags/MiniFlatFlags_Germany.svg" height="14" class="mr-1" /> Germany
+    </MudSelectItem>
+    <MudSelectItem Value="@("Italy")">
+        <img src="/data/flags/MiniFlatFlags_Italy.svg" height="14" class="mr-1" /> Italy
+    </MudSelectItem>
+    <MudSelectItem Value="@("Netherlands")">
+        <img src="/data/flags/MiniFlatFlags_Netherlands.svg" height="14" class="mr-1" /> Netherlands
+    </MudSelectItem>
+    <MudSelectItem Value="@("Portugal")">
+        <img src="/data/flags/MiniFlatFlags_Portugal.svg" height="14" class="mr-1" /> Portugal
+    </MudSelectItem>
+    <MudSelectItem Value="@("Russia")">
+        <img src="/data/flags/MiniFlatFlags_Russia.svg" height="14" class="mr-1" /> Russia
+    </MudSelectItem>
+    <MudSelectItem Value="@("Spain")">
+        <img src="/data/flags/MiniFlatFlags_Spain.svg" height="14" class="mr-1" /> Spain
+    </MudSelectItem>
+    <MudSelectItem Value="@("United Kingdom")">
+        <img src="/data/flags/MiniFlatFlags_United Kingdom.svg" height="14" class="mr-1" /> United Kingdom
+    </MudSelectItem>
+</MudSelect>
+
+<DVProject_Wasm.Components.CuriositiesChartComponent SelectedCountry="@Country"></DVProject_Wasm.Components.CuriositiesChartComponent>
+
+
+@code {
+    public string Country { get; set; } = "Italy";
+}

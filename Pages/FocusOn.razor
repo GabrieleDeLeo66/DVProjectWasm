@@ -1,0 +1,20 @@
+﻿@page "/focuson"
+@using MudBlazor
+@using DVProject_Wasm.Components
+
+<PageTitle>Focus On</PageTitle>
+
+<h1 style="font-family: Cambria">Focus On</h1>
+
+<MudToggleGroup T="string" Style="width: 100%" @bind-Value="@Field" Color="Color.Surface">
+                <MudToggleItem Text="@("Total Cases")" Value="@("total_cases")"/>
+                <MudToggleItem Text="@("Total Deaths")" Value="@("total_deaths")"/>
+                <MudToggleItem Text="@("Total Vaccinations")" Value="@("total_vaccinations")"/>
+                <MudToggleItem Text="@("Total Tests")" Value="@("total_tests")"/>
+</MudToggleGroup>
+
+<DVProject_Wasm.Components.FocusOnChartComponent SelectedField="@Field"></DVProject_Wasm.Components.FocusOnChartComponent>
+
+@code {
+    public string Field { get; set; } = "total_cases";
+}

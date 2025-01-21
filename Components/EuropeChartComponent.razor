@@ -1,0 +1,275 @@
+﻿@using MudBlazor
+@using Syncfusion.Blazor.LinearGauge
+<script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
+@inject IJSRuntime JS
+
+
+<script>
+    function arrotondaNumero(numero, nDecimali) {
+        var numero_arrotondato =
+            Math.round(numero * Math.pow(10, nDecimali)) / Math.pow(10, nDecimali);
+
+        return numero_arrotondato;
+    }
+
+    function MapEurope(initialDate) {
+        // The svg
+        var svg = d3.select("#map").append("svg").attr("id", "svgMap");
+        (width = +svg.attr("width", "1000px")),
+            (height = +svg.attr("height", "1000px"));
+
+        // Map and projection
+        var path = d3.geoPath();
+        var projection = d3.geoAiry().scale(1150).translate([400, 1320]);
+
+        // Data and color scale
+        var temperatures = [];
+        for (var i = 36.5; i < 43; i = i + 0.25) {
+            temperatures.push(i);
+        }
+        console.log(temperatures);
+        var data = d3.map();
+        var colors = d3.scaleLinear().domain([0, 24]).range(["white", "#C40000"]);
+        var c = [];
+        for (var i = 0; i < 25; i++) c.push(colors(i));
+        console.log(c);
+        var colorScale = d3.scaleQuantize().domain([36.5, 42]).range(c);
+        temperatures.forEach(function (item) {
+            console.log(colorScale(item));
+        });
+        console.log(colorScale(42));
+
+
+        // Load external data and boot
+        d3.queue()
+            .defer(d3.json, "/data/europe.geo.json")
+            .defer(d3.csv, "/data/owid-covid-data-Europe.csv", function (d) {
+
+                element = {
+                    "date": d.date,
+                    "location": d.iso_code,
+                    "new_cases": d.new_cases
+                };
+
+
+                json = { "main": [] }
+                if (!data.get(d.date)) {
+                    json.main.push(element);
+                    data.set(d.date, json);
+                }
+                else {
+                    tmp = data.get(d.date);
+                    tmp.main.push(element);
+                    data.set(d.date, tmp);
+                }
+            })
+            .await(ready);
+
+        // d3.select("#map")
+        //     .append("input")
+        //     .attr("type", "date")
+        //     .attr("id", "date")
+        //     .attr("value", "2022-02-17")
+        //     .attr("min", "2020-03-20")
+        //     .attr("max", "2022-02-17")
+        //     .attr(
+        //         "style",
+        //         "position: absolute;top: 350px;left: 50px;font-family: Montserrat;font-size: large;background-color: #1e88cf;color: #fff;border-color: #333"
+        //     );
+
+        d3.select("body")
+            .append("div")
+            .attr("id", "tooltip")
+            .attr(
+                "style",
+                "position: absolute; opacity: 0; width: 170px;background-color: #1e88cf;color: #fff;text-align: center;padding: 5px 0;border-radius: 6px;font-family: Montserrat;"
+            );
+
+        // Draw the map
+        function ready(error, topo) {
+            console.log(data);
+
+            var mouseLeave = function (d) {
+                d3.selectAll(".Country").transition().duration(200).style("opacity", 1);
+
+                d3.select("#tooltip").transition().duration(100).style("opacity", 0);
+            };
+
+            // Draw the map
+            svg
+                .append("g")
+                .selectAll("path")
+                .data(topo.features)
+                .enter()
+                .append("path")
+                // draw each country
+                .attr("d", d3.geoPath().projection(projection))
+                .style("stroke", "#ACABAB")
+                // set the color of each country
+                .attr("fill", function (d) {
+                    json = data.get(initialDate);
+                    console.log(initialDate)
+                    json.main.forEach(function (item) {
+                        if (d.properties.iso_a3 == -99) {
+                            if (item.location == "OWID_KOS")
+                                d.total = item.new_cases;
+                        }
+                        if (item.location == d.properties.iso_a3) {
+                            d.total = item.new_cases;
+                        }
+                    });
+                    if (isNaN(d.total))
+                        return ("#d3d3d3");
+                    console.log(d.properties.geounit);
+                    var fever = Math.log(d.total / 1000 + 1) + 36.5;
+                    console.log(arrotondaNumero(fever, 1));
+                    return colorScale(arrotondaNumero(fever, 1));
+                })
+                .attr("class", function (d) {
+                    return "Country";
+                })
+                .on(
+                    "mouseover",
+                    (mouseOver = function (d) {
+                        d3.selectAll(".Country")
+                            .transition()
+                            .duration(200)
+                            .style("opacity", 0.2);
+                        d3.select(this).transition().duration(200).style("opacity", 1);
+
+                        d3.select("#tooltip")
+                            .html(
+                                d.properties.geounit +
+                                "&lt;br>New cases: " +
+                                d.total +
+                                "&lt;br>Fever: " +
+                                arrotondaNumero(Math.log(d.total / 1000 + 1) + 36.5, 1) +
+                                "&degC"
+                            )
+                            .transition()
+                            .duration(100)
+                            .style("opacity", 1);
+                    })
+                )
+                .on("mouseleave", mouseLeave)
+                .on("mousemove", function () {
+                    d3.select("#tooltip")
+                        .style("left", d3.event.pageX + 10 + "px")
+                        .style("top", d3.event.pageY + 10 + "px");
+                });
+
+            // function UpdateEurope(selectedDate) {
+            //     d3.selectAll("Path").attr("d", d3.geoPath().projection(projection)).attr("fill", function (d) {
+            //         json = data.get(selectedDate);
+            //         console.log(selectedDate)
+            //         json.main.forEach(function (item) {
+            //             if (d.properties.iso_a3 == -99) {
+            //                 if (item.location == "OWID_KOS")
+            //                     d.total = item.new_cases;
+            //             }
+            //             if (item.location == d.properties.iso_a3) {
+            //                 d.total = item.new_cases;
+            //             }
+            //         });
+            //         if (isNaN(d.total))
+            //             return ("#d3d3d3");
+            //         console.log(d.properties.geounit);
+            //         var fever = Math.log(d.total / 1000 + 1) + 36.5;
+            //         console.log(arrotondaNumero(fever, 1));
+            //         return colorScale(arrotondaNumero(fever, 1));
+            //     })
+            // }
+
+            // When a button change, I run the update function
+            // d3.select("#date").on("change", update);
+
+            // And I initialize it at the beginning
+
+        }  
+    }
+
+    function UpdateEurope(selectedDate) {
+
+        d3.select("#svgMap").transition().duration(1000).remove();
+        MapEurope(selectedDate);
+        // var projection = d3.geoAiry().scale(1150).translate([400, 1320]);
+        // var data = d3.map();
+
+        // d3.selectAll("Path").attr("d", d3.geoPath().projection(projection)).attr("fill", function (d) {
+        //     json = data.get(selectedDate);
+        //     console.log(selectedDate)
+        //     console.log(json)
+        //     json.main.forEach(function (item) {
+        //         if (d.properties.iso_a3 == -99) {
+        //             if (item.location == "OWID_KOS")
+        //                 d.total = item.new_cases;
+        //         }
+        //         if (item.location == d.properties.iso_a3) {
+        //             d.total = item.new_cases;
+        //         }
+        //     });
+        //     if (isNaN(d.total))
+        //         return ("#d3d3d3");
+        //     console.log(d.properties.geounit);
+        //     var fever = Math.log(d.total / 1000 + 1) + 36.5;
+        //     console.log(arrotondaNumero(fever, 1));
+        //     return colorScale(arrotondaNumero(fever, 1));
+        // })
+    }
+
+</script>
+
+<h1 style="font-family: Cambria">Covid Night-teen Fever - an ill Europe</h1>
+
+<MudDatePicker IsDateDisabledFunc="@((DateTime dt)=>((int)dt.DayOfWeek > 0 && (int)dt.DayOfWeek < 7))" Label="Selected Date" MinDate=@DateTime.Parse("2020-01-05") MaxDate="@DateTime.Parse("2024-08-04")" Date="_date" DateChanged="@((d) => OnDateChanged(d))" />
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-10" id="map"></div>
+        <div class="col-sm-2">
+            <SfLinearGauge Width="100px" Height="400px" Background="transparent">
+                <LinearGaugeContainer Width="20" Type="ContainerType.Thermometer">
+                    <LinearGaugeAxes>
+                        <LinearGaugeAxis Minimum="36" Maximum="43">
+                            <LinearGaugePointers>
+                                <LinearGaugePointer PointerValue="43" Width="15" Type="Point.Bar"
+                                                    Color="#a6a6a6">
+                                </LinearGaugePointer>
+                            </LinearGaugePointers>
+                            <LinearGaugeRanges>
+                                <LinearGaugeRange Start="36" End="36.75" StartWidth="10" EndWidth="10" Color="#ffffff" />
+                                <LinearGaugeRange Start="36.75" End="37" StartWidth="10" EndWidth="10" Color="#fdf4f4" />
+                                <LinearGaugeRange Start="37" End="37.25" StartWidth="10" EndWidth="10" Color="#faeaea" />
+                                <LinearGaugeRange Start="37.25" End="37.5" StartWidth="10" EndWidth="10" Color="#f8dfdf" />
+                                <LinearGaugeRange Start="37.5" End="37.75" StartWidth="10" EndWidth="10" Color="#f5d5d5" />
+                                <LinearGaugeRange Start="37.75" End="38" StartWidth="10" EndWidth="10" Color="#f3caca" />
+                                <LinearGaugeRange Start="38" End="38.25" StartWidth="10" EndWidth="10" Color="#f0bfbf" />
+                                <LinearGaugeRange Start="38.25" End="38.5" StartWidth="10" EndWidth="10" Color="#eeb5b5" />
+                                <LinearGaugeRange Start="38.5" End="38.75" StartWidth="10" EndWidth="10" Color="#e99f9f" />
+                                <LinearGaugeRange Start="38.75" End="39" StartWidth="10" EndWidth="10" Color="#e69595" />
+                                <LinearGaugeRange Start="39" End="39.25" StartWidth="10" EndWidth="10" Color="#e48a8a" />
+                                <LinearGaugeRange Start="39.25" End="39.5" StartWidth="10" EndWidth="10" Color="#e28080" />
+                                <LinearGaugeRange Start="39.5" End="39.75" StartWidth="10" EndWidth="10" Color="#df7575" />
+                                <LinearGaugeRange Start="39.75" End="40" StartWidth="10" EndWidth="10" Color="#dd6a6a" />
+                                <LinearGaugeRange Start="40" End="40.25" StartWidth="10" EndWidth="10" Color="#da6060" />
+                                <LinearGaugeRange Start="40.25" End="40.5" StartWidth="10" EndWidth="10" Color="#d54a4a" />
+                                <LinearGaugeRange Start="40.5" End="40.75" StartWidth="10" EndWidth="10" Color="#d34040" />
+                                <LinearGaugeRange Start="40.75" End="41" StartWidth="10" EndWidth="10" Color="#d03535" />
+                                <LinearGaugeRange Start="41" End="41.25" StartWidth="10" EndWidth="10" Color="#ce2b2b" />
+                                <LinearGaugeRange Start="41.25" End="41.5" StartWidth="10" EndWidth="10" Color="#cb2020" />
+                                <LinearGaugeRange Start="41.5" End="41.75" StartWidth="10" EndWidth="10" Color="#c91515" />
+                                <LinearGaugeRange Start="41.75" End="42" StartWidth="10" EndWidth="10" Color="#c60b0b" />
+                                <LinearGaugeRange Start="42" End="43" StartWidth="10" EndWidth="10" Color="#c40000" />
+                            </LinearGaugeRanges>
+                        </LinearGaugeAxis>
+                    </LinearGaugeAxes>
+                </LinearGaugeContainer>
+            </SfLinearGauge>
+        </div>
+    </div>
+</div>
