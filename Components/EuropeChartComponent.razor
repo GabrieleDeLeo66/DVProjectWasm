@@ -20,12 +20,12 @@
     function MapEurope(initialDate) {
         // The svg
         var svg = d3.select("#map").append("svg").attr("id", "svgMap");
-        (width = +svg.attr("width", "1000px")),
-            (height = +svg.attr("height", "1000px"));
+        (width = +svg.attr("width", "80vw")),
+            (height = +svg.attr("height", "80vh"));
 
         // Map and projection
         var path = d3.geoPath();
-        var projection = d3.geoAiry().scale(1150).translate([400, 1320]);
+        var projection = d3.geoAiry().scale(1000).translate([400, 1100]);
 
         // Data and color scale
         var temperatures = [];
