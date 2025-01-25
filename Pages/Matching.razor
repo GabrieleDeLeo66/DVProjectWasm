@@ -1,0 +1,87 @@
+﻿@page "/matching"
+@using DVProject_Wasm
+@using MudBlazor
+@using Syncfusion.Blazor.Buttons
+
+
+<PageTitle>Matching</PageTitle>
+
+<h1 style="font-family: Cambria">Matching</h1>
+
+<MudGrid Justify="Justify.FlexStart">
+    <MudItem lg="4">
+        <MudSelect @bind-Value="@Country" Label="Country" Variant="Variant.Outlined">
+            <MudSelectItem Value="@("France")">
+                <img src="data/flags/MiniFlatFlags_France.svg" height="14" class="mr-1" /> France
+            </MudSelectItem>
+            <MudSelectItem Value="@("Germany")">
+                <img src="data/flags/MiniFlatFlags_Germany.svg" height="14" class="mr-1" /> Germany
+            </MudSelectItem>
+            <MudSelectItem Value="@("Italy")">
+                <img src="data/flags/MiniFlatFlags_Italy.svg" height="14" class="mr-1" /> Italy
+            </MudSelectItem>
+            <MudSelectItem Value="@("Netherlands")">
+                <img src="data/flags/MiniFlatFlags_Netherlands.svg" height="14" class="mr-1" /> Netherlands
+            </MudSelectItem>
+            <MudSelectItem Value="@("Portugal")">
+                <img src="data/flags/MiniFlatFlags_Portugal.svg" height="14" class="mr-1" /> Portugal
+            </MudSelectItem>
+            <MudSelectItem Value="@("Russia")">
+                <img src="data/flags/MiniFlatFlags_Russia.svg" height="14" class="mr-1" /> Russia
+            </MudSelectItem>
+            <MudSelectItem Value="@("Spain")">
+                <img src="data/flags/MiniFlatFlags_Spain.svg" height="14" class="mr-1" /> Spain
+            </MudSelectItem>
+            <MudSelectItem Value="@("United Kingdom")">
+                <img src="data/flags/MiniFlatFlags_United Kingdom.svg" height="14" class="mr-1" /> United Kingdom
+            </MudSelectItem>
+        </MudSelect>
+    </MudItem>
+    <MudItem lg="4">
+        <MudSelect @bind-Value="@Bar" Label="BarChart Feature" Variant="Variant.Outlined">
+            <MudSelectItem Value="@("new_cases")">
+                New Cases
+            </MudSelectItem>
+            <MudSelectItem Value="@("new_deaths")">
+                New Deaths
+            </MudSelectItem>
+            <MudSelectItem Value="@("new_vaccinations")">
+                New Vaccinations
+            </MudSelectItem>
+            <MudSelectItem Value="@("new_tests")">
+                New Tests
+            </MudSelectItem>
+        </MudSelect>
+    </MudItem>
+    <MudItem lg="4">
+        <MudSelect @bind-Value="@Line" Label="LineChart Feature" Variant="Variant.Outlined">
+            <MudSelectItem Value="@("total_cases")">
+                Total Cases
+            </MudSelectItem>
+            <MudSelectItem Value="@("total_deaths")">
+                Total Deaths
+            </MudSelectItem>
+            <MudSelectItem Value="@("total_vaccinations")">
+                Total Vaccinations
+            </MudSelectItem>
+            <MudSelectItem Value="@("total_tests")">
+                Total Tests
+            </MudSelectItem>
+        </MudSelect>
+    </MudItem>
+</MudGrid>
+
+
+
+
+
+
+<DVProject_Wasm.Components.MatchingChartComponent SelectedCountry="@Country" SelectedBar="@Bar" SelectedLine="@Line" Loading="@Loading"></DVProject_Wasm.Components.MatchingChartComponent>
+
+
+@code {
+    public string Country { get; set; } = "Italy";
+    public string Bar { get; set; } = "new_cases";
+    public string Line { get; set; } = "total_vaccinations";
+    public bool Loading = true;
+}
