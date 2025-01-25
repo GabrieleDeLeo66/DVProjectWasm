@@ -3,6 +3,7 @@
 @using MudBlazor
 
 <PageTitle>Index</PageTitle>
+<h1 style="font-family: Cambria">Covid Night-teen Fever - an ill Europe</h1>
 
 <MudDatePicker IsDateDisabledFunc="@((DateTime dt)=>((int)dt.DayOfWeek > 0 && (int)dt.DayOfWeek < 7))" Label="Selected Date" MinDate=@DateTime.Parse("2020-01-05") MaxDate="@DateTime.Parse("2024-08-04")" Date="@SelectedDate" DateChanged="@((d) => OnDateChanged(d))" />
 <EuropeChartComponent Loading=@Loading SelectedDate=@SelectedDate></EuropeChartComponent>

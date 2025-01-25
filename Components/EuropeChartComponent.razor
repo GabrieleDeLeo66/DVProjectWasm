@@ -163,33 +163,6 @@
                         .style("top", d3.event.pageY + 10 + "px");
                 });
 
-            // function UpdateEurope(selectedDate) {
-            //     d3.selectAll("Path").attr("d", d3.geoPath().projection(projection)).attr("fill", function (d) {
-            //         json = data.get(selectedDate);
-            //         console.log(selectedDate)
-            //         json.main.forEach(function (item) {
-            //             if (d.properties.iso_a3 == -99) {
-            //                 if (item.location == "OWID_KOS")
-            //                     d.total = item.new_cases;
-            //             }
-            //             if (item.location == d.properties.iso_a3) {
-            //                 d.total = item.new_cases;
-            //             }
-            //         });
-            //         if (isNaN(d.total))
-            //             return ("#d3d3d3");
-            //         console.log(d.properties.geounit);
-            //         var fever = Math.log(d.total / 1000 + 1) + 36.5;
-            //         console.log(arrotondaNumero(fever, 1));
-            //         return colorScale(arrotondaNumero(fever, 1));
-            //     })
-            // }
-
-            // When a button change, I run the update function
-            // d3.select("#date").on("change", update);
-
-            // And I initialize it at the beginning
-
         }  
     }
 
@@ -197,36 +170,11 @@
 
         d3.select("#svgMap").transition().duration(1000).remove();
         MapEurope(selectedDate);
-        // var projection = d3.geoAiry().scale(1150).translate([400, 1320]);
-        // var data = d3.map();
-
-        // d3.selectAll("Path").attr("d", d3.geoPath().projection(projection)).attr("fill", function (d) {
-        //     json = data.get(selectedDate);
-        //     console.log(selectedDate)
-        //     console.log(json)
-        //     json.main.forEach(function (item) {
-        //         if (d.properties.iso_a3 == -99) {
-        //             if (item.location == "OWID_KOS")
-        //                 d.total = item.new_cases;
-        //         }
-        //         if (item.location == d.properties.iso_a3) {
-        //             d.total = item.new_cases;
-        //         }
-        //     });
-        //     if (isNaN(d.total))
-        //         return ("#d3d3d3");
-        //     console.log(d.properties.geounit);
-        //     var fever = Math.log(d.total / 1000 + 1) + 36.5;
-        //     console.log(arrotondaNumero(fever, 1));
-        //     return colorScale(arrotondaNumero(fever, 1));
-        // })
+        
     }
 
 </script>
 
-<h1 style="font-family: Cambria">Covid Night-teen Fever - an ill Europe</h1>
-
-@* <MudDatePicker IsDateDisabledFunc="@((DateTime dt)=>((int)dt.DayOfWeek > 0 && (int)dt.DayOfWeek < 7))" Label="Selected Date" MinDate=@DateTime.Parse("2020-01-05") MaxDate="@DateTime.Parse("2024-08-04")" Date="_date" DateChanged="@((d) => OnDateChanged(d))" /> *@
 
 <div class="container">
     <div class="row">      

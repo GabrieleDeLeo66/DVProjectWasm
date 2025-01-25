@@ -212,15 +212,6 @@
 
         }
 
-        // legend = chart.children.push(am5.Legend.new(root, {
-        //     x: am5.percent(50),
-        //     centerX: am5.percent(50),
-        //     layout: root.gridLayout,
-        //     height: am5.percent(20),
-        //     verticalScrollbar: am5.Scrollbar.new(root, {
-        //         orientation: "vertical"
-        //     })
-        // }));
         legend.data.setAll(chart.series.values.filter((p) => p._settings.name.includes(selectedField)));
 
         for (var i = 0; i < legend.dataItems.length; i++) {
@@ -234,7 +225,6 @@
         }
 
         chart.appear(2000, 500);
-        // legendDataItem.get("markerRectangle").set("forceHidden", true);
     }
 
     function UpdateChart(newField) {
