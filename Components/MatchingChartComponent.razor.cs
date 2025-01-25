@@ -15,6 +15,23 @@ namespace DVProject_Wasm.Components
         public bool Loading { get; set; }
 
         public bool RenderCooldown = false;
+
+        [Inject]
+        public NavigationManager NavigationManager { get; set; }
+
+        protected override void OnInitialized()
+        {
+            NavigationManager.LocationChanged += NavigationManager_LocationChanged;
+        }
+
+        private void NavigationManager_LocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+        {
+            Dispose();
+        }
+        public void Dispose()
+        {
+            NavigationManager.LocationChanged -= NavigationManager_LocationChanged;
+        }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (!RenderCooldown)
@@ -23,12 +40,11 @@ namespace DVProject_Wasm.Components
                 {
                     await base.OnAfterRenderAsync(firstRender);
                     await Task.Delay(1000);
-                    await JS.InvokeVoidAsync("CreateChart", SelectedCountry, SelectedBar, SelectedLine);
+                    await JS.InvokeVoidAsync("CreateChart2", SelectedCountry, SelectedBar, SelectedLine);
                 }
                 else
                 {
-                    await Task.Delay(1000);
-                    await JS.InvokeVoidAsync("UpdateChart", SelectedCountry, SelectedBar, SelectedLine);
+                    await JS.InvokeVoidAsync("UpdateChart2", SelectedCountry, SelectedBar, SelectedLine);
                 }
                 Loading = false;
                 RenderCooldown = true;

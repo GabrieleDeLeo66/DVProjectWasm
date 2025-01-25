@@ -13,6 +13,23 @@ namespace DVProject_Wasm.Components
 
         public bool RenderCooldown = false;
 
+        [Inject]
+        public NavigationManager NavigationManager { get; set; }
+
+        protected override void OnInitialized()
+        {
+            NavigationManager.LocationChanged += NavigationManager_LocationChanged;
+        }
+
+        private void NavigationManager_LocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+        {
+            Dispose();
+        }
+        public void Dispose()
+        {
+            NavigationManager.LocationChanged -= NavigationManager_LocationChanged;
+        }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (!RenderCooldown)
@@ -20,14 +37,16 @@ namespace DVProject_Wasm.Components
                 if (firstRender)
                 {
                     await base.OnAfterRenderAsync(firstRender);
-                    await Task.Delay(1000);
+                    await Task.Delay(2000);
                     await JS.InvokeVoidAsync("CreateChart", SelectedField);
+                    await Task.Delay(2000);
                 }
                 else
                 {
-                    await Task.Delay(1000);
                     await JS.InvokeVoidAsync("UpdateChart", SelectedField);
+                    await Task.Delay(2000);
                 }
+                
                 Loading = false;
                 RenderCooldown = true;
                 StateHasChanged();
