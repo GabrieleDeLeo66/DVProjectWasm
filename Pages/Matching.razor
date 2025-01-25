@@ -88,13 +88,13 @@
     [Parameter]
     public bool? Reload{ get; set; }
     [Inject]
-    public NavigationManager NavManager { get; set; }
+    public IJSRuntime JS { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         if (Reload.HasValue && Reload.Value == true)
         {
-            NavManager.NavigateTo("/matching", true);
+            await JS.InvokeVoidAsync("location.replace", "/matching");
         }
     }
 }
