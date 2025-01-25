@@ -1,4 +1,5 @@
 ﻿@page "/matching"
+@page "/matching/{Reload:bool}"
 @using DVProject_Wasm
 @using MudBlazor
 @using Syncfusion.Blazor.Buttons
@@ -84,4 +85,16 @@
     public string Bar { get; set; } = "new_cases";
     public string Line { get; set; } = "total_vaccinations";
     public bool Loading = true;
+    [Parameter]
+    public bool? Reload{ get; set; }
+    [Inject]
+    public NavigationManager NavManager { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (Reload.HasValue && Reload.Value == true)
+        {
+            NavManager.NavigateTo("/matching", true);
+        }
+    }
 }

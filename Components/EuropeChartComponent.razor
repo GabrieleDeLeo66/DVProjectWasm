@@ -32,17 +32,17 @@
         for (var i = 36.5; i < 43; i = i + 0.25) {
             temperatures.push(i);
         }
-        console.log(temperatures);
+        // console.log(temperatures);
         var data = d3.map();
         var colors = d3.scaleLinear().domain([0, 24]).range(["white", "#C40000"]);
         var c = [];
         for (var i = 0; i < 25; i++) c.push(colors(i));
-        console.log(c);
+        // console.log(c);
         var colorScale = d3.scaleQuantize().domain([36.5, 42]).range(c);
         temperatures.forEach(function (item) {
-            console.log(colorScale(item));
+            // console.log(colorScale(item));
         });
-        console.log(colorScale(42));
+        // console.log(colorScale(42));
 
 
         // Load external data and boot
@@ -92,7 +92,7 @@
 
         // Draw the map
         function ready(error, topo) {
-            console.log(data);
+            // console.log(data);
 
             var mouseLeave = function (d) {
                 d3.selectAll(".Country").transition().duration(200).style("opacity", 1);
@@ -113,7 +113,7 @@
                 // set the color of each country
                 .attr("fill", function (d) {
                     json = data.get(initialDate);
-                    console.log(initialDate)
+                    // console.log(initialDate)
                     json.main.forEach(function (item) {
                         if (d.properties.iso_a3 == -99) {
                             if (item.location == "OWID_KOS")
@@ -125,9 +125,9 @@
                     });
                     if (isNaN(d.total))
                         return ("#d3d3d3");
-                    console.log(d.properties.geounit);
+                    // console.log(d.properties.geounit);
                     var fever = Math.log(d.total / 1000 + 1) + 36.5;
-                    console.log(arrotondaNumero(fever, 1));
+                    // console.log(arrotondaNumero(fever, 1));
                     return colorScale(arrotondaNumero(fever, 1));
                 })
                 .attr("class", function (d) {

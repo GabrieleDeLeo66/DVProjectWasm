@@ -36,7 +36,9 @@
         selectedBarChart = bar;
         selectedLineChart = line;
 
-        root2 = am5.Root.new("chartdiv");
+        am5.ready(function () {
+            root2 = am5.Root.new("chartdiv");
+        });
         root2.setThemes([
             am5themes_Animated.new(root2)
         ]);
@@ -106,7 +108,7 @@
 
     function ready() {
 
-        console.log(data2)
+        // console.log(data2)
 
         var series = chart2.series.push(am5xy.LineSeries.new(root2, {
             name: selectedLineChart,

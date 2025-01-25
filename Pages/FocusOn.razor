@@ -1,4 +1,5 @@
 ﻿@page "/focuson"
+@page "/focuson/{Reload:bool}"
 @using MudBlazor
 @using DVProject_Wasm.Components
 
@@ -19,4 +20,16 @@
 @code {
     public string Field { get; set; } = "total_cases";
     public bool Loading = true;
+    [Parameter]
+    public bool? Reload { get; set; }
+    [Inject]
+    public NavigationManager NavManager { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (Reload.HasValue && Reload.Value == true)
+        {
+            NavManager.NavigateTo("/focuson", true);
+        }
+    }
 }

@@ -110,8 +110,8 @@
     var mainCountry = [ "Italy", "France", "Spain", "Portugal", "Germany", "United Kingdom", "Netherlands", "Russia" ]
 
     function ready() {
-        console.log(data)
-        console.log(selectedField)
+        // console.log(data)
+        // console.log(selectedField)
 
         var locations = Object.keys(data);
         for (var i = 0; i < locations.length; i++) {
@@ -139,7 +139,7 @@
             });
             if (selectedField == "total_cases")
                 tot_cases.data.setAll(data[locations[i]]);
-            console.log(tot_cases)
+            // console.log(tot_cases)
 
             var tot_deaths = chart.series.push(
                 am5xy.LineSeries.new(root, {
@@ -162,7 +162,7 @@
             });
             if (selectedField == "total_deaths")
                 tot_deaths.data.setAll(data[locations[i]]);
-            console.log(tot_deaths)
+            // console.log(tot_deaths)
 
             var tot_vaccinations = chart.series.push(
                 am5xy.LineSeries.new(root, {
@@ -185,7 +185,7 @@
             });
             if (selectedField == "total_vaccinations")
                 tot_vaccinations.data.setAll(data[locations[i]]);
-            console.log(tot_deaths)
+            // console.log(tot_deaths)
 
             var tot_tests = chart.series.push(
                 am5xy.LineSeries.new(root, {
@@ -208,7 +208,7 @@
             });
             if (selectedField == "total_tests")
                 tot_tests.data.setAll(data[locations[i]]);
-            console.log(tot_deaths)
+            // console.log(tot_deaths)
 
         }
 
